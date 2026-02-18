@@ -1,4 +1,5 @@
 from typing import Optional, List
+from datetime import datetime, timezone
 from sqlmodel import Field, SQLModel, Relationship
 
 class Model(SQLModel, table=True):
@@ -25,7 +26,7 @@ class EvaluationSession(SQLModel, table=True):
     # Psychometrics: 1-7 Likert scale. 1 = Strongly disagree, 7 = Strongly agree.
     trust_rating: int = Field(ge=1, le=7, description="Likert scale 1-7")
 
-    # Temporal Data: Standardized to UTC
+    # Temporal Data: Standardized to UTC # Default factory returns the time when a row is created
     started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc)) # UTC timezone
     completed_at: Optional[datetime] = Field(default=None)
     
