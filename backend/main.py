@@ -52,6 +52,49 @@ class CompleteSessionRequest(BaseModel):
 def read_root():
     return {"message": "North Star API"}
 
+@app.get("/api/results")
+def get_results(session: Session = Depends(get_session)):
+    """Aggregate stats for the results dashboard."""
+    completed = session.exec(
+        select(EvaluationSession).where(EvaluationSession.completed_at != None)
+    ).all()
+
+    total = len(completed)
+
+    scenario_map: dict = {}
+    for s in completed:
+        sid = s.scenario_id
+        if sid not in scenario_map:
+            scenario_map[sid] = {"count": 0, "trust_sum": 0, "confidence_sum": 0}
+        scenario_map[sid]["count"] += 1
+        scenario_map[sid]["trust_sum"] += s.trust_rating or 0
+        scenario_map[sid]["confidence_sum"] += s.confidence_rating or 0
+
+    scenarios = []
+    for sid, data in scenario_map.items():
+        n = data["count"]
+        scenarios.append({
+            "scenario_id": sid,
+            "completions": n,
+            "avg_trust": round(data["trust_sum"] / n, 2) if n else 0,
+            "avg_confidence": round(data["confidence_sum"] / n, 2) if n else 0,
+        })
+
+    recent = sorted(completed, key=lambda s: s.completed_at or s.started_at, reverse=True)[:10]
+    recent_out = [
+        {
+            "id": s.id,
+            "scenario_id": s.scenario_id,
+            "trust_rating": s.trust_rating,
+            "confidence_rating": s.confidence_rating,
+            "completed_at": s.completed_at.isoformat() if s.completed_at else None,
+        }
+        for s in recent
+    ]
+
+    return {"total_completions": total, "by_scenario": scenarios, "recent_sessions": recent_out}
+
+
 @app.get("/models/", response_model=list[Model])
 def read_models(session: Session = Depends(get_session)):
     return session.exec(select(Model)).all()
