@@ -1,5 +1,7 @@
 # North Star — HF-Driven AI Model Evaluation Platform
 
+**Live Demo:** https://north-star-prototype.up.railway.app
+
 North Star is a specialized, human-in-the-loop Artificial Intelligence evaluation infrastructure. It is designed from the ground up to measure critical Human Factors phenomena—specifically **Trust Calibration** and **Automation Bias**—that standard technical benchmarks (MMLU, GSM8K) fundamentally cannot capture.
 
 This platform allows AI Safety and Reliability teams to "red-team" model behavior through structured, multi-stage human interaction metrics before deployment.
@@ -45,28 +47,6 @@ For controlled Human Factors testing, **scenario-based injection is the methodol
 - SQLModel / SQLAlchemy Object-Relational Mapping
 - PostgreSQL (Production setup) / SQLite (Local prototyping)
 - Rigorous temporal tracking to account for "Ghost Sessions" (abandoned tabs) and latency.
-
----
-
-## Getting Started (Local Development)
-
-The codebase includes a unified bootstrap script to instantly spin up the entire isolated prototype environment.
-
-### Prerequisites
-Ensure you have the following installed:
-- Node.js (v18+)
-- Python (3.12+)
-
-### Quick Start
-From your command prompt, execute the development batch file:
-```bash
-./start_dev.bat
-```
-*This script automatically activates the Python virtual environment, spins up the Uvicorn FastAPI server on port `9000`, and simultaneously starts the Next.js development server on port `3000`.*
-
-### Usage
-- **Application Interface:** Go to `http://localhost:3000` to run through the Human-Factors evaluation phase.
-- **Data Documentation:** Go to `http://127.0.0.1:9000/docs` to view the FastAPI Swagger UI and test the underlying state-machine endpoints.
 
 ---
 
