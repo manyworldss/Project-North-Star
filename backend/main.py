@@ -12,7 +12,7 @@ from models import Model, EvaluationSession
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     # Mock data seeding for the prototype
-    from .database import engine
+    from database import engine
     with Session(engine) as seed_session:
         mock_model = seed_session.exec(select(Model).where(Model.name == "Mock-GPT-4o")).first()
         if not mock_model:
