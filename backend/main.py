@@ -5,8 +5,8 @@ from contextlib import asynccontextmanager
 from pydantic import BaseModel
 from datetime import datetime, timezone
 
-from .database import create_db_and_tables, get_session
-from .models import Model, EvaluationSession
+from database import create_db_and_tables, get_session
+from models import Model, EvaluationSession
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

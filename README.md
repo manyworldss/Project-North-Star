@@ -1,4 +1,4 @@
-# North Star ✧ HF-Driven AI Model Evaluation Platform
+# North Star — HF-Driven AI Model Evaluation Platform
 
 North Star is a specialized, human-in-the-loop Artificial Intelligence evaluation infrastructure. It is designed from the ground up to measure critical Human Factors phenomena—specifically **Trust Calibration** and **Automation Bias**—that standard technical benchmarks (MMLU, GSM8K) fundamentally cannot capture.
 
@@ -6,7 +6,7 @@ This platform allows AI Safety and Reliability teams to "red-team" model behavio
 
 ---
 
-## 🔬 Core Methodology
+## Core Methodology
 
 Unlike standard LLM "chatbots," North Star uses a strict linear evaluation flow to capture human behavioral changes when exposed to confident—but flawed—AI advice.
 
@@ -20,7 +20,7 @@ By comparing **Stage 1** to **Stage 3**, the platform mathematically detects a "
 
 ---
 
-## 🧠 Why Scenario-Based Testing Over Live API Inference?
+## Why Scenario-Based Testing Over Live API Inference?
 
 A common question is: *Why does the platform use carefully hardcoded scenario injections instead of calling a live API like OpenAI's GPT-4?*
 
@@ -32,7 +32,7 @@ For controlled Human Factors testing, **scenario-based injection is the methodol
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 **Frontend: Clean, Developer-Focused SaaS UI**
 - Next.js 14 (App Router)
@@ -48,22 +48,54 @@ For controlled Human Factors testing, **scenario-based injection is the methodol
 
 ---
 
-## 🚀 Getting Started (Local Development)
+## Getting Started (Local Development)
 
 The codebase includes a unified bootstrap script to instantly spin up the entire isolated prototype environment.
 
-### 1. Prerequisites
+### Prerequisites
 Ensure you have the following installed:
 - Node.js (v18+)
 - Python (3.12+)
 
-### 2. Quick Start
+### Quick Start
 From your command prompt, execute the development batch file:
 ```bash
 ./start_dev.bat
 ```
 *This script automatically activates the Python virtual environment, spins up the Uvicorn FastAPI server on port `9000`, and simultaneously starts the Next.js development server on port `3000`.*
 
-### 3. Usage
+### Usage
 - **Application Interface:** Go to `http://localhost:3000` to run through the Human-Factors evaluation phase.
 - **Data Documentation:** Go to `http://127.0.0.1:9000/docs` to view the FastAPI Swagger UI and test the underlying state-machine endpoints.
+
+---
+
+## Deployment (Railway)
+
+This project is deployed via [Railway](https://railway.app) as two separate services: a FastAPI backend and a Next.js frontend.
+
+### Prerequisites
+Install the Railway CLI:
+```bash
+npm install -g @railway/cli
+```
+
+### Service Configuration
+
+In the Railway dashboard, create two services from this repository:
+
+**Backend service**
+- Root Directory: `/` (repo root)
+- Uses `railway.toml` at the root
+- Provision a PostgreSQL plugin — Railway will inject `DATABASE_URL` automatically
+
+**Frontend service**
+- Root Directory: `frontend/`
+- Uses `frontend/railway.toml`
+- Set environment variable: `NEXT_PUBLIC_API_URL=https://<your-backend-service>.railway.app/api`
+
+### Deploy via CLI
+```bash
+railway login
+railway up
+```

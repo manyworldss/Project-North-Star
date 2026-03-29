@@ -2,4 +2,4 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "cd frontend && npm start"
+startCommand = "npm start"
