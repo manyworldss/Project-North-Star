@@ -1,81 +1,86 @@
-# North Star — HF-Driven AI Model Evaluation Platform
+# North Star — AI Evaluation Platform
 
 **Live Demo:** https://north-star-prototype.up.railway.app
 
-North Star is a specialized, human-in-the-loop Artificial Intelligence evaluation infrastructure. It is designed from the ground up to measure critical Human Factors phenomena—specifically **Trust Calibration** and **Automation Bias**—that standard technical benchmarks (MMLU, GSM8K) fundamentally cannot capture.
+---
 
-This platform allows AI Safety and Reliability teams to "red-team" model behavior through structured, multi-stage human interaction metrics before deployment.
+AI is an incredible tool when it augments human thinking. The problem is when it replaces it.
+
+I built North Star out of a growing concern I couldn't shake: AI can be confidently, seriously wrong, and most people don't push back. Not because they're careless, but because the confidence of the response short-circuits the instinct to question it. That is Automation Bias, and it is happening across every industry right now with very little being done to measure it.
+
+What frustrated me most was that existing AI evaluation is almost entirely model-centric. Benchmarks measure what the model gets right. Nobody is measuring what happens to the human on the other side. Users are not being included in that research process at all, and the long-term cognitive effects of AI over-reliance are something we simply don't have enough data on yet.
+
+North Star is my attempt to start filling that gap.
 
 ---
 
-## Core Methodology
+## What It Does
 
-Unlike standard LLM "chatbots," North Star uses a strict linear evaluation flow to capture human behavioral changes when exposed to confident—but flawed—AI advice.
+The platform puts a person through a structured 4-stage evaluation designed to detect behavioral drift caused by AI influence:
 
-### The 4-Stage Pipeline
-1. **Stage 1 (Baseline Judgment):** The user is presented with a complex, ambiguous scenario (e.g., a UX/Design System decision, a Code Vulnerability review) and forced to provide an initial judgment *before* seeing any AI feedback.
-2. **Stage 2 (AI Intervention):** The system injects a pre-calculated, highly confident recommendation from the AI.
-3. **Stage 3 (Final Decision):** The user submits their final professional decision after reviewing the AI's advice.
-4. **Stage 4 (Psychometrics):** The user scales their explicit *Trust in the AI* and *Confidence in their own answer* using a 1-7 Likert rating.
+1. **Baseline Judgment** — the participant records their professional decision before seeing any AI input
+2. **AI Intervention** — the system injects a confident, pre-calculated recommendation that is deliberately wrong
+3. **Final Decision** — the participant submits their answer after reviewing the AI
+4. **Psychometrics** — they rate their Trust in the AI and Confidence in their answer on a 1-7 Likert scale
 
-By comparing **Stage 1** to **Stage 3**, the platform mathematically detects a "Mismatch Signal"—proving exactly when over-reliance on AI caused the human to swap away from a correct baseline answer.
-
----
-
-## Why Scenario-Based Testing Over Live API Inference?
-
-A common question is: *Why does the platform use carefully hardcoded scenario injections instead of calling a live API like OpenAI's GPT-4?*
-
-For controlled Human Factors testing, **scenario-based injection is the methodologically correct approach.**
-
-1. **Experimental Ground Truth:** To measure "Automation Bias" (a human blindly following bad AI advice), you *must* guarantee the AI provides a highly confident, conceptually flawed answer. Live APIs are non-deterministic; they might accidentally provide the correct advice, instantly invalidating the psychological evaluation for that session.
-2. **Causal Repeatability:** In A/B testing and behavioral tracking, consistency is paramount. Static injections ensure that every single participant across an engineering or QA team experiences the exact same failure mode parameters.
-3. **Targeted Failure Isolation:** Instead of hoping an LLM fails naturally, researchers can deliberately inject specific, known failure patterns (e.g., algorithm-confusion vulnerabilities in code, false regulatory citations) to test human resiliency to domain-specific confident hallucinations.
+Comparing Stage 1 to Stage 3 produces the core measurement: did the person change a correct answer to an incorrect one after the AI weighed in? That is an automation bias event. The Likert ratings add a second layer, capturing whether the person knew they were uncertain or whether they were confidently wrong.
 
 ---
 
-## Technology Stack
+## Who It's For
 
-**Frontend: Clean, Developer-Focused SaaS UI**
-- Next.js 14 (App Router)
-- React hooks for state-driven 4-stage transitions
-- Tailwind CSS (Hyper-minimal dark mode, high-contrast borders)
-- Fetch API configured for specific CORS tunneling
-
-**Backend: Robust HF Data Persistence**
-- Python FastAPI (Secure, isolated REST endpoints)
-- SQLModel / SQLAlchemy Object-Relational Mapping
-- PostgreSQL (Production setup) / SQLite (Local prototyping)
-- Rigorous temporal tracking to account for "Ghost Sessions" (abandoned tabs) and latency.
+Anyone in an organisation that relies on AI day to day. That could be a team evaluating an AI tool before rolling it out, a manager wanting to understand how their team interacts with AI recommendations, or a researcher studying human-AI trust. The scenarios are built around roles that are already deeply AI-dependent: UX designers, data analysts, software engineers, security analysts, and recruiters.
 
 ---
 
-## Deployment (Railway)
+## Why Static Injection Instead of a Live API
 
-This project is deployed via [Railway](https://railway.app) as two separate services: a FastAPI backend and a Next.js frontend.
+This is the decision people ask about most, so it is worth explaining clearly.
 
-### Prerequisites
-Install the Railway CLI:
-```bash
-npm install -g @railway/cli
-```
+To measure automation bias, the AI response has to be wrong in a specific, controlled way. If the platform called a live model, that model might give the correct answer, a hedged answer, or a different wrong answer on every run. Any of those outcomes breaks the experiment because you can no longer attribute the participant's behavioral change to a known stimulus.
 
-### Service Configuration
+Static injection means every participant sees the exact same confident, flawed recommendation for a given scenario. That consistency is what makes the measurement valid and repeatable across sessions. It is the same reason aviation and medical simulation studies use scripted system failures rather than hoping something goes wrong naturally.
 
-In the Railway dashboard, create two services from this repository:
+---
+
+## Scenarios
+
+Each scenario was built around a specific cognitive bias vector relevant to that professional role. The AI responses were engineered to sound authoritative and partially true, which is what makes them genuinely difficult to reject.
+
+| Role | Scenario | Failure Mode |
+|---|---|---|
+| UX / Product | Button accessibility vs. conversion rate | Metric fixation over compliance |
+| Data Analyst | Shipping an underpowered A/B test | Misplaced statistical confidence |
+| Junior SWE | Approving MD5 password hashing | Deference to established but broken tooling |
+| Cybersecurity | Triaging an authenticated SQL injection as Medium | Risk underestimation via framing |
+| HR / Recruiter | Rejecting a qualified candidate over an employment gap | Efficiency framing masking discriminatory filtering |
+
+---
+
+## Tech Stack
+
+**Frontend:** Next.js 16, React 19, Tailwind CSS v4, TypeScript
+
+**Backend:** Python FastAPI, SQLModel, PostgreSQL (production) / SQLite (local)
+
+**Deployed on Railway** as two separate services with a live results dashboard showing aggregate trust scores, confidence ratings, and session history across all scenarios.
+
+---
+
+## Deployment
+
+Two services on Railway: a FastAPI backend and a Next.js frontend.
 
 **Backend service**
-- Root Directory: `/` (repo root)
-- Uses `railway.toml` at the root
-- Provision a PostgreSQL plugin — Railway will inject `DATABASE_URL` automatically
+- Root Directory: `backend/`
+- Provision a PostgreSQL plugin and Railway injects `DATABASE_URL` automatically
 
 **Frontend service**
 - Root Directory: `frontend/`
-- Uses `frontend/railway.toml`
-- Set environment variable: `NEXT_PUBLIC_API_URL=https://<your-backend-service>.railway.app/api`
+- Set environment variable: `NEXT_PUBLIC_API_URL=https://<your-backend>.railway.app/api`
 
-### Deploy via CLI
 ```bash
+npm install -g @railway/cli
 railway login
 railway up
 ```
