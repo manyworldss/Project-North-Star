@@ -112,12 +112,12 @@ export default function ResultsPage() {
       {/* Header */}
       <header className="border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-md bg-blue-600 flex items-center justify-center flex-shrink-0">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1l1.5 4h4l-3.2 2.4 1.2 4L7 9 3.5 11.4l1.2-4L1.5 5h4L7 1z" fill="white" />
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1L9.5 6.5L15 8L9.5 9.5L8 15L6.5 9.5L1 8L6.5 6.5Z" fill="white" />
             </svg>
           </div>
-          <span className="text-sm font-semibold tracking-tight text-zinc-100">North Star</span>
+          <span className="text-sm font-semibold tracking-tight text-zinc-100" style={{ fontFamily: "var(--font-space-grotesk)" }}>North Star</span>
           <span className="text-zinc-700 text-xs hidden sm:block">/ Results</span>
         </div>
         <Link
@@ -130,7 +130,7 @@ export default function ResultsPage() {
 
       <main className="max-w-3xl mx-auto px-6 py-12">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-white mb-1">Aggregate Results</h1>
+          <h1 className="text-2xl font-semibold text-white mb-1" style={{ fontFamily: "var(--font-space-grotesk)" }}>Aggregate Results</h1>
           <p className="text-sm text-zinc-400">
             Live data from all completed evaluation sessions. All AI injections were deliberately incorrect — high trust scores indicate measurable automation bias.
           </p>
