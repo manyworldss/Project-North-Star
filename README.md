@@ -65,22 +65,3 @@ Each scenario was built around a specific cognitive bias vector relevant to that
 
 **Deployed on Railway** as two separate services with a live results dashboard showing aggregate trust scores, confidence ratings, and session history across all scenarios.
 
----
-
-## Deployment
-
-Two services on Railway: a FastAPI backend and a Next.js frontend.
-
-**Backend service**
-- Root Directory: `backend/`
-- Provision a PostgreSQL plugin and Railway injects `DATABASE_URL` automatically
-
-**Frontend service**
-- Root Directory: `frontend/`
-- Set environment variable: `NEXT_PUBLIC_API_URL=https://<your-backend>.railway.app/api`
-
-```bash
-npm install -g @railway/cli
-railway login
-railway up
-```
