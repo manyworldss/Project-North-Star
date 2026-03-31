@@ -206,24 +206,37 @@ export default function Home() {
 
       {/* Header */}
       <header className="border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20">
+        <Link href="/" onClick={stage > 0 ? reset : undefined} className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20 group-hover:bg-blue-500 transition-colors">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M8 1L9.5 6.5L15 8L9.5 9.5L8 15L6.5 9.5L1 8L6.5 6.5Z" fill="white" />
             </svg>
           </div>
           <span className="text-sm font-semibold tracking-tight text-zinc-100" style={{ fontFamily: "var(--font-space-grotesk)" }}>North Star</span>
           <span className="text-zinc-700 text-xs hidden sm:block">/ HF Evaluation Platform</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-3">
           {sessionId && (
             <span className="text-xs font-mono text-zinc-500 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded">
               Session #{sessionId}
             </span>
           )}
-          <Link href="/results" className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-600 px-3 py-1.5 rounded-md transition-colors">
-            Results
-          </Link>
+          {stage >= 1 && stage < 5 && (
+            <button
+              onClick={reset}
+              className="text-xs text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M7.5 2.5L3 6l4.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Exit
+            </button>
+          )}
+          {stage === 0 && (
+            <Link href="/results" className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-600 px-3 py-1.5 rounded-md transition-colors">
+              Results
+            </Link>
+          )}
         </div>
       </header>
 
@@ -569,12 +582,23 @@ export default function Home() {
             </div>
           </div>
 
-          <button
-            onClick={reset}
-            className="w-full border border-zinc-800 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
-          >
-            Run Another Evaluation
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={reset}
+              className="border border-zinc-800 hover:border-zinc-600 text-zinc-400 hover:text-zinc-200 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+            >
+              Run Another Evaluation
+            </button>
+            <Link
+              href="/results"
+              className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors text-center flex items-center justify-center gap-2"
+            >
+              View Aggregate Results
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 2.5L9 6 4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          </div>
         </main>
       )}
     </div>

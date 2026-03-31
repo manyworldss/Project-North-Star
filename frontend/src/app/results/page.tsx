@@ -40,25 +40,16 @@ interface ScenarioStat {
   avg_confidence: number;
 }
 
-interface RecentSession {
-  id: number;
-  scenario_id: string;
-  trust_rating: number;
-  confidence_rating: number;
-  completed_at: string;
-}
-
 interface Results {
   total_completions: number;
   by_scenario: ScenarioStat[];
-  recent_sessions: RecentSession[];
 }
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
       <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">{label}</p>
-      <p className="text-3xl font-semibold text-white">{value}</p>
+      <p className="text-3xl font-semibold text-white" style={{ fontFamily: "var(--font-space-grotesk)" }}>{value}</p>
       {sub && <p className="text-xs text-zinc-500 mt-1">{sub}</p>}
     </div>
   );
@@ -75,12 +66,6 @@ function LikertBar({ value, max = 7 }: { value: number; max?: number }) {
       <span className="text-sm font-medium text-zinc-300 w-8 text-right">{value.toFixed(1)}</span>
     </div>
   );
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("en-US", {
-    month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
-  });
 }
 
 export default function ResultsPage() {
@@ -109,30 +94,32 @@ export default function ResultsPage() {
 
   return (
     <div className="bg-zinc-950 text-zinc-100 min-h-screen font-sans">
-      {/* Header */}
       <header className="border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20 group-hover:bg-blue-500 transition-colors">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M8 1L9.5 6.5L15 8L9.5 9.5L8 15L6.5 9.5L1 8L6.5 6.5Z" fill="white" />
             </svg>
           </div>
           <span className="text-sm font-semibold tracking-tight text-zinc-100" style={{ fontFamily: "var(--font-space-grotesk)" }}>North Star</span>
           <span className="text-zinc-700 text-xs hidden sm:block">/ Results</span>
-        </div>
+        </Link>
         <Link
           href="/"
-          className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-600 px-3 py-1.5 rounded-md transition-colors"
+          className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-600 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
         >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M7.5 2.5L3 6l4.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
           Run Evaluation
         </Link>
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-white mb-1" style={{ fontFamily: "var(--font-space-grotesk)" }}>Aggregate Results</h1>
-          <p className="text-sm text-zinc-400">
-            Live data from all completed evaluation sessions. All AI injections were deliberately incorrect — high trust scores indicate measurable automation bias.
+        <div className="mb-10">
+          <h1 className="text-2xl font-semibold text-white mb-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>Aggregate Results</h1>
+          <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">
+            Live data from all completed evaluation sessions. Every AI injection was deliberately incorrect — a high average trust score is evidence of measurable automation bias across participants.
           </p>
         </div>
 
@@ -153,30 +140,34 @@ export default function ResultsPage() {
 
         {data && (
           <div className="space-y-8">
-            {/* Summary stats */}
             <div className="grid grid-cols-3 gap-3">
-              <StatCard label="Total Completions" value={data.total_completions} sub="all scenarios" />
-              <StatCard label="Avg AI Trust" value={avgTrustAll} sub="out of 7 (lower is better)" />
+              <StatCard label="Total Completions" value={data.total_completions} sub="across all scenarios" />
+              <StatCard label="Avg AI Trust" value={avgTrustAll} sub="out of 7 — lower is better" />
               <StatCard label="Avg Confidence" value={avgConfAll} sub="out of 7" />
             </div>
 
-            {/* Per-scenario breakdown */}
             <div>
-              <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">By Scenario</h2>
+              <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">By Scenario</h2>
               {data.by_scenario.length === 0 ? (
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center text-zinc-500 text-sm">
-                  No completed sessions yet. Run an evaluation to see data here.
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-10 text-center">
+                  <p className="text-zinc-500 text-sm mb-4">No completed sessions yet.</p>
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Run the first evaluation
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {data.by_scenario.map((s) => {
                     const meta = SCENARIO_META[s.scenario_id];
                     return (
-                      <div key={s.scenario_id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
-                        <div className="flex items-start justify-between mb-4">
+                      <div key={s.scenario_id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+                        <div className="flex items-start justify-between mb-5">
                           <div>
                             {meta && (
-                              <span className={`text-xs font-medium border px-1.5 py-0.5 rounded ${meta.roleColor} mb-1.5 inline-block`}>
+                              <span className={`text-xs font-medium border px-1.5 py-0.5 rounded ${meta.roleColor} mb-2 inline-block`}>
                                 {meta.role}
                               </span>
                             )}
@@ -184,32 +175,30 @@ export default function ResultsPage() {
                               {meta?.title ?? s.scenario_id}
                             </h3>
                           </div>
-                          <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-1 rounded font-mono">
+                          <span className="text-xs text-zinc-500 bg-zinc-800/80 px-2.5 py-1 rounded-md font-mono flex-shrink-0 ml-4">
                             {s.completions} {s.completions === 1 ? "session" : "sessions"}
                           </span>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           <div>
-                            <div className="flex justify-between mb-1.5">
+                            <div className="flex justify-between mb-2">
                               <span className="text-xs text-zinc-500">Avg Trust in AI</span>
-                              <span className="text-xs text-zinc-500">1 — 7</span>
+                              <span className="text-xs text-zinc-600">scale 1 — 7</span>
                             </div>
                             <LikertBar value={s.avg_trust} />
                           </div>
                           <div>
-                            <div className="flex justify-between mb-1.5">
+                            <div className="flex justify-between mb-2">
                               <span className="text-xs text-zinc-500">Avg Answer Confidence</span>
-                              <span className="text-xs text-zinc-500">1 — 7</span>
+                              <span className="text-xs text-zinc-600">scale 1 — 7</span>
                             </div>
                             <LikertBar value={s.avg_confidence} />
                           </div>
                         </div>
-                        <div className="mt-4 pt-4 border-t border-zinc-800">
-                          <p className="text-xs text-zinc-600">
-                            Trust bar color: <span className="text-emerald-400">green</span> = low bias risk,{" "}
-                            <span className="text-amber-400">amber</span> = moderate,{" "}
-                            <span className="text-red-400">red</span> = high automation bias detected.
-                          </p>
+                        <div className="mt-5 pt-4 border-t border-zinc-800/80 flex items-center gap-4 text-xs text-zinc-600">
+                          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500/70 inline-block" />Low bias risk</span>
+                          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500/70 inline-block" />Moderate</span>
+                          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500/70 inline-block" />High automation bias</span>
                         </div>
                       </div>
                     );
@@ -218,49 +207,18 @@ export default function ResultsPage() {
               )}
             </div>
 
-            {/* Recent sessions table */}
-            {data.recent_sessions.length > 0 && (
-              <div>
-                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">Recent Sessions</h2>
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-zinc-800">
-                        <th className="text-left text-xs text-zinc-500 font-medium px-4 py-3">Session</th>
-                        <th className="text-left text-xs text-zinc-500 font-medium px-4 py-3">Scenario</th>
-                        <th className="text-left text-xs text-zinc-500 font-medium px-4 py-3">Trust</th>
-                        <th className="text-left text-xs text-zinc-500 font-medium px-4 py-3">Confidence</th>
-                        <th className="text-left text-xs text-zinc-500 font-medium px-4 py-3 hidden sm:table-cell">Completed</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.recent_sessions.map((s, i) => {
-                        const meta = SCENARIO_META[s.scenario_id];
-                        return (
-                          <tr key={s.id} className={i < data.recent_sessions.length - 1 ? "border-b border-zinc-800/60" : ""}>
-                            <td className="px-4 py-3 font-mono text-xs text-zinc-500">#{s.id}</td>
-                            <td className="px-4 py-3">
-                              {meta ? (
-                                <span className={`text-xs font-medium border px-1.5 py-0.5 rounded ${meta.roleColor}`}>
-                                  {meta.role}
-                                </span>
-                              ) : (
-                                <span className="text-xs text-zinc-500">{s.scenario_id}</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3 text-zinc-300">{s.trust_rating}/7</td>
-                            <td className="px-4 py-3 text-zinc-300">{s.confidence_rating}/7</td>
-                            <td className="px-4 py-3 text-zinc-500 text-xs hidden sm:table-cell">
-                              {s.completed_at ? formatDate(s.completed_at) : "—"}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            <div className="pt-4 border-t border-zinc-800/60 flex items-center justify-between">
+              <p className="text-xs text-zinc-600">All sessions contribute anonymously to aggregate data.</p>
+              <Link
+                href="/"
+                className="text-xs text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1.5"
+              >
+                Run an evaluation
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M4.5 2.5L9 6 4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
+            </div>
           </div>
         )}
       </main>
